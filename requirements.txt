@@ -1,0 +1,10 @@
+# Dependencies for Healthcare_project.py, the script that regenerates the
+# Plotly figure JSON files in scrollytelling_assets/. Not needed to just view
+# or serve index.html -- that's plain static HTML/JS plus a CDN-hosted Plotly.
+
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.18.0
+datasets>=2.19.0
+statsmodels>=0.14.0
+linearmodels>=5.0

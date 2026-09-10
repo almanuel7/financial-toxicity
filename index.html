@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Toxicity: The Anatomy of a Medical Shock</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        #header {
+            padding: 10vh 5vw 5vh 5vw;
+            max-width: 800px;
+            margin: 0 auto;
+            border-bottom: 1px solid #000;
+            margin-bottom: 5vh;
+        }
+
+        #header h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+        }
+
+        #header p {
+            font-size: 1.25rem;
+            color: #555;
+            font-weight: 300;
+        }
+
+        #scrolly {
+            display: flex;
+            position: relative;
+            padding: 0 5vw;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        article {
+            position: relative;
+            padding: 0;
+            width: 35%; 
+            padding-bottom: 50vh; 
+            z-index: 2;
+        }
+
+        .step {
+            margin: 0 auto 80vh auto;
+            padding: 1rem 2rem 1rem 0;
+            opacity: 0.2;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .step p {
+            font-size: 1.15rem;
+            color: #333;
+        }
+
+        .step h2 {
+            font-size: 1.5rem;
+            border-top: 2px solid #000;
+            padding-top: 1rem;
+        }
+
+        .step.is-active {
+            opacity: 1;
+        }
+
+        figure {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0; 
+            width: 65%;
+            height: 100vh; 
+            margin: 0;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        /* UPGRADED: Added a smooth "fade up" transform transition */
+        #chart-container {
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .metric-highlight {
+            font-weight: 700;
+            color: #F94144; /* Updated to match new palette */
+            background-color: rgba(249, 65, 68, 0.1);
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>Financial Toxicity: The Anatomy of a Medical Shock</h1>
+        <p>An econometric audit of unexpected medical billing variance.</p>
+    </div>
+
+    <section id="scrolly">
+        <article>
+            <div class="step" data-scene="scene1">
+                <h2>The Billing Black Box</h2>
+                <p>Marcus recovers from a severe diabetic episode, relieved that the physical danger has passed. Then the hospital bill arrives.</p>
+                <p>Healthcare pricing is notoriously opaque. When we map out standard medical conditions like Diabetes, Asthma, and Heart Disease, the distribution of costs is astonishingly wide. A routine procedure that costs one patient a reasonable deductible can bankrupt another.</p>
+            </div>
+
+            <div class="step" data-scene="scene2">
+                <h2>Where Do Shocks Happen?</h2>
+                <p>Is this variance just a matter of being uninsured or not? Not entirely.</p>
+                <p>Looking at the variance matrix, we see that the nature of the admission disrupts standard pricing tiers. When patients enter through <strong>Emergency or Trauma</strong> pathways, they lose the ability to "shop around." Price transparency vanishes, and the variance in billing across all insurance networks explodes.</p>
+            </div>
+
+            <div class="step" data-scene="scene3">
+                <h2>The Baseline Cost (2SLS Model)</h2>
+                <p>To separate correlation from causation, we deployed an <strong>Instrumental Variable (2SLS) model</strong>. The diagnostics are rock-solid (a Wu-Hausman p-value of 0.0000 and a massive F-statistic of 746.54).</p>
+                <p>The model reveals a surprising truth: the physical length of care is relatively affordable. Every extra day in the hospital causally increases the baseline bill by exactly <span class="metric-highlight" id="causal-impact">Loading...</span>.</p>
+                <p>But if care only accumulates at this modest daily rate, what causes the catastrophic medical bills?</p>
+            </div>
+
+            <div class="step" data-scene="scene4">
+                <h2>The Unexplained Residuals</h2>
+                <p>By calculating the predicted baseline bill and subtracting it from what patients were actually charged, we isolate the <strong>Residuals</strong>.</p>
+                <p>The highlighted points on this chart represent the top 1% of statistical anomalies—patients like Marcus. These are "Unexplained Shocks." They cannot be justified by the patient's age, their specific condition, or how many days they stayed in a bed. They represent pure, systemic financial toxicity baked into the pricing architecture itself.</p>
+            </div>
+            <div class="step" data-scene="scene5">
+                <h2>A Note on Data & Governance</h2>
+                <p>The dataset driving this analysis (<code>Nicolybgs/healthcare_data</code> via Hugging Face) is entirely synthetic. Due to HIPAA regulations and strict internal governance, the highly granular patient-level billing and diagnostic data I work with daily cannot be publicly shared.</p>
+                <p>In the real world, the distribution of costs is influenced by complex, negotiated payer-provider contracts, and the resulting narrative might look different. I built this project using synthetic data specifically to highlight my technical ability to engineer scalable cloud data pipelines, apply rigorous econometric causal inference (2SLS), and translate complex actuarial outputs into human-centric, data narratives.</p>
+            </div>
+        </article>
+
+        <figure>
+            <div id="chart-container" style="text-align: center; color: #999;">              
+                 <em>Loading interactive charts...</em>
+            </div>
+        </figure>
+    </section>
+
+    <script>
+        const ASSET_BASE_PATH = 'scrollytelling_assets/';
+        const chartCache = {}; 
+        let currentScene = '';
+
+        const fileMap = {
+            'scene1': 'scene1_billing_distribution.json',
+            'scene2': 'scene2_insurance_variance.json',
+            'scene3': 'scene3_causal_coefficients.json',
+            'scene4': 'scene4_residual_outliers.json'
+        };
+
+        // User-Requested Color Palette
+        const palette = ['#F94144', '#F8961E', '#f9C74F', '#90BE6D', '#43AA8B', '#577590'];
+
+        // 1. THE PRELOADER
+        async function preloadAssets() {
+            try {
+                const metricRes = await fetch(ASSET_BASE_PATH + 'model_metrics.json');
+                const metricData = await metricRes.json();
+                document.getElementById('causal-impact').innerText = '$' + metricData.causal_impact_per_day.toLocaleString();
+            } catch (err) {
+                console.error("Could not load metrics: ", err);
+            }
+
+            for (const [scene, file] of Object.entries(fileMap)) {
+                try {
+                    const res = await fetch(ASSET_BASE_PATH + file);
+                    chartCache[scene] = await res.json();
+                } catch (err) {
+                    console.error(`Failed to preload ${file}:`, err);
+                }
+            }
+        }
+        
+        preloadAssets();
+
+        // 2. RENDER CHART (With Race-Condition Fix)
+        async function renderChart(sceneName) {
+            if (sceneName === currentScene) return;
+            currentScene = sceneName;
+
+            const chartDiv = document.getElementById('chart-container');
+
+            // NEW LOGIC: If we hit Scene 5, fade the chart out to nothing and stop.
+            if (sceneName === 'scene5') {
+                chartDiv.style.opacity = 0;
+                chartDiv.style.transform = 'translateY(15px)';
+                return;
+            }
+            
+            const fileName = fileMap[sceneName];
+            if (!fileName) return;
+
+            // Fade Out
+            chartDiv.style.opacity = 0;
+            chartDiv.style.transform = 'translateY(15px)';
+
+            // Wait for fade out
+            setTimeout(async () => {
+                let figure;
+                
+                // FIX: If the preloader finished, use the cache. 
+                // If it hasn't finished yet, fetch it right now!
+                if (chartCache[sceneName]) {
+                    figure = JSON.parse(JSON.stringify(chartCache[sceneName]));
+                } else {
+                    try {
+                        const response = await fetch(ASSET_BASE_PATH + fileName);
+                        const rawData = await response.json();
+                        chartCache[sceneName] = rawData; 
+                        figure = JSON.parse(JSON.stringify(rawData));
+                    } catch (error) {
+                        chartDiv.innerHTML = "<em>Error loading chart data.</em>";
+                        chartDiv.style.opacity = 1;
+                        return;
+                    }
+                }
+                
+                // Empty the "Loading..." text before drawing the chart
+                if (chartDiv.innerHTML.includes("Loading")) {
+                    chartDiv.innerHTML = ""; 
+                }
+
+                const fontStyle = {family: "'Helvetica Neue', Helvetica, Arial, sans-serif", color: '#333'};
+                
+                figure.layout.autosize = true;
+                // Added sizeable left/right margins and a protected bottom margin for the x-axis
+                figure.layout.margin = {l: 120, r: 120, t: 60, b: 80}; 
+                figure.layout.paper_bgcolor = '#ffffff';
+                figure.layout.plot_bgcolor = '#ffffff';
+                figure.layout.font = fontStyle;
+                
+                // Inject the global colorway
+                figure.layout.colorway = palette;
+
+                // --- 2. TOOLTIP (HOVERLABEL) AESTHETICS ---
+                figure.layout.hoverlabel = {
+                    bgcolor: '#ffffff',
+                    bordercolor: '#cccccc',
+                    font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif", size: 14, color: '#2c3e50' },
+                    align: 'left'
+                };
+
+                // --- 3. AXIS CLEANUP ---
+                if (figure.layout.xaxis) {
+                    figure.layout.xaxis.showgrid = false;
+                    figure.layout.xaxis.zeroline = true;
+                    figure.layout.xaxis.zerolinecolor = '#eeeeee';
+                    figure.layout.xaxis.title.font = { size: 14, ...fontStyle };
+                    figure.layout.xaxis.tickfont = { size: 12, ...fontStyle };
+                }
+                if (figure.layout.yaxis) {
+                    figure.layout.yaxis.showgrid = true;
+                    figure.layout.yaxis.gridcolor = '#f0f0f0';
+                    figure.layout.yaxis.zeroline = true;
+                    figure.layout.yaxis.zerolinecolor = '#dddddd';
+                    figure.layout.yaxis.title.font = { size: 14, ...fontStyle };
+                    figure.layout.yaxis.tickfont = { size: 12, ...fontStyle };
+                }
+
+                // --- 4. DYNAMIC COLOR OVERRIDES BY SCENE ---
+                const groupColors = {};
+                let colorIdx = 0;
+
+                figure.data.forEach((trace) => {
+                    if (sceneName === 'scene1' || sceneName === 'scene2') {
+                        // Intercept Plotly's trace generation and explicitly lock marginals and histograms to the same palette color
+                        const groupName = trace.legendgroup || trace.name;
+                        if (groupName) {
+                            if (!groupColors[groupName]) {
+                                groupColors[groupName] = palette[colorIdx % palette.length];
+                                colorIdx++;
+                            }
+                            if (trace.marker) trace.marker.color = groupColors[groupName];
+                            if (trace.line) trace.line.color = groupColors[groupName];
+                        }
+                    } 
+                    else if (sceneName === 'scene3') {
+                        if (trace.marker) trace.marker.color = '#43AA8B'; 
+                    }
+                    else if (sceneName === 'scene4') {
+                        // Isolate the Outliers vs Baseline points
+                        if (String(trace.name).toLowerCase() === 'true') {
+                            trace.marker.color = '#F94144'; // Red
+                            trace.marker.size = 8;
+                            trace.marker.opacity = 1;
+                            trace.marker.line = {color: '#ffffff', width: 1}; // Clean white border 
+                        } else {
+                            trace.marker.color = '#577590'; // Slate Blue
+                            trace.marker.size = 4; // Smaller radius to de-emphasize naturally
+                            trace.marker.opacity = 0.75; // Crisper, non-faded base
+                            trace.marker.line = {width: 0};
+                        }
+                    }
+                });
+                
+                Plotly.react(chartDiv, figure.data, figure.layout, {displayModeBar: false, responsive: true});
+                
+                // Fade In & Float Up
+                chartDiv.style.opacity = 1;
+                chartDiv.style.transform = 'translateY(0)';
+            }, 400); 
+        }
+
+        // 3. THE CENTER-SCREEN OBSERVER
+        const steps = document.querySelectorAll('.step');
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '-50% 0px -49% 0px', 
+            threshold: 0 
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    steps.forEach(s => s.classList.remove('is-active'));
+                    entry.target.classList.add('is-active');
+                    
+                    const scene = entry.target.getAttribute('data-scene');
+                    renderChart(scene);
+                }
+            });
+        }, observerOptions);
+
+        steps.forEach(step => observer.observe(step));
+    </script>
+</body>
+</html>
