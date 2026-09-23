@@ -52,10 +52,17 @@ pip install -r requirements.txt
 python3 Healthcare_project.py
 ```
 
-## A performance note
+## Chart design
 
-The four scene files (`scene1_billing_distribution.json` ~19.3MB, `scene2_insurance_variance.json` ~8.6MB, `scene3_causal_coefficients.json` ~6.8MB, `scene4_residual_outliers.json` ~31.6MB) add up to roughly 66MB fetched by a visitor's browser. None of this will block a GitHub push (GitHub's hard limit is 100MB per file), and the page will work correctly on GitHub Pages as-is -- but ~66MB is a lot for a page to load, especially on mobile. If load time turns out to matter, the fix would be in `Healthcare_project.py`: sampling the dataset before passing it to `px.histogram`/`px.scatter`, dropping unused `hover_data` columns, or switching the scatter traces to WebGL (`scattergl`) -- not something this GitHub-readiness pass changes on its own.
+Every chart is built from pre-aggregated summary statistics rather than raw per-row data, which is what keeps the page fast:
+
+- **Scene 1 (Billing Black Box)** -- a ridgeline/joyplot of billing distributions by condition, each curve a `scipy.stats.gaussian_kde` evaluated on a shared 220-point grid, colored with a continuous teal-to-crimson gradient (not a categorical palette) so overlapping curves blend into neighboring hues instead of muddying together.
+- **Scene 2 (Where Do Shocks Happen?)** -- a grouped box plot of billing by insurance x admission type, built from precomputed quartile/fence statistics rather than raw values.
+- **Scene 3 (The Baseline Cost)** -- a two-panel figure: a naive-vs-AIPW effect-size comparison bar, and a propensity-score overlap histogram (the positivity check) below it.
+- **Scene 4 (The Unexplained Residuals)** -- a 2D density heatmap (binned counts, zero-count cells masked transparent) of model-expected vs. actual billing for the bulk of patients, with the top 1% of residual outliers overlaid as individual points.
+
+Because every scene is built from bin counts or summary statistics instead of raw per-row data, the four scene files together total well under 1MB (down from an earlier per-row-data version of these charts that ran to roughly 66MB) -- fast enough to load comfortably on mobile, with no change to the underlying model or narrative.
 
 ## Tech stack
 
-Plotly.js (CDN), vanilla JS `IntersectionObserver` for the scroll-driven narrative, and a Python data pipeline (pandas, Plotly Express, statsmodels, scikit-learn) for the causal model and chart generation.
+Plotly.js (CDN), vanilla JS `IntersectionObserver` for the scroll-driven narrative, and a Python data pipeline (pandas, Plotly `graph_objects`/`subplots`, `scipy.stats` for kernel density estimation, statsmodels, scikit-learn) for the causal model and chart generation.

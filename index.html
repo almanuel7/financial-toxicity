@@ -5,42 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Toxicity: The Anatomy of a Medical Shock</title>
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --paper: #FBF9F4;
+            --paper-deep: #F4F0E7;
+            --ink: #1C1B1A;
+            --muted: #6B6660;
+            --line: #DFD8C9;
+            --grid: #EDE7DC;
+            --teal: #2B5F6B;
+            --crimson: #B3282D;
+            --crimson-wash: rgba(179, 40, 45, 0.09);
+            --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+            --sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
             margin: 0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: #000000;
-            line-height: 1.6;
+            font-family: var(--sans);
+            background-color: var(--paper);
+            color: var(--ink);
+            line-height: 1.65;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
         h1, h2, h3 {
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
+            font-family: var(--serif);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin: 0 0 0.5rem 0;
         }
 
+        /* ---------------------------------------------------------
+           Scroll progress rail
+        --------------------------------------------------------- */
+        #progress-rail {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            width: 0%;
+            background: var(--crimson);
+            z-index: 50;
+            transition: width 0.1s linear;
+        }
+
+        /* ---------------------------------------------------------
+           Header / masthead
+        --------------------------------------------------------- */
         #header {
-            padding: 10vh 5vw 5vh 5vw;
-            max-width: 800px;
+            padding: 12vh 5vw 6vh 5vw;
+            max-width: 760px;
             margin: 0 auto;
-            border-bottom: 1px solid #000;
-            margin-bottom: 5vh;
+            border-bottom: 1px solid var(--ink);
+            margin-bottom: 6vh;
+        }
+
+        .kicker {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--crimson);
+            margin-bottom: 1.1rem;
         }
 
         #header h1 {
-            font-size: 3rem;
-            line-height: 1.1;
+            font-size: clamp(2.1rem, 5vw, 3.4rem);
+            line-height: 1.08;
+            font-weight: 600;
         }
 
         #header p {
-            font-size: 1.25rem;
-            color: #555;
-            font-weight: 300;
+            font-size: 1.2rem;
+            color: var(--muted);
+            font-weight: 400;
+            max-width: 42ch;
+            margin-top: 1rem;
         }
 
+        /* ---------------------------------------------------------
+           Scrollytelling layout
+        --------------------------------------------------------- */
         #scrolly {
             display: flex;
             position: relative;
@@ -52,26 +106,39 @@
         article {
             position: relative;
             padding: 0;
-            width: 35%; 
-            padding-bottom: 50vh; 
+            width: 38%;
+            padding-bottom: 40vh;
             z-index: 2;
         }
 
         .step {
-            margin: 0 auto 80vh auto;
-            padding: 1rem 2rem 1rem 0;
-            opacity: 0.2;
+            margin: 0 auto 78vh auto;
+            padding: 1.4rem 3rem 1.4rem 0;
+            opacity: 0.25;
             transition: opacity 0.4s ease-in-out;
         }
 
+        .step:last-child { margin-bottom: 20vh; }
+
+        .step .scene-kicker {
+            display: block;
+            font-family: var(--sans);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+        }
+
         .step p {
-            font-size: 1.15rem;
-            color: #333;
+            font-size: 1.1rem;
+            color: #3A3733;
         }
 
         .step h2 {
-            font-size: 1.5rem;
-            border-top: 2px solid #000;
+            font-size: 1.65rem;
+            border-top: 2px solid var(--ink);
             padding-top: 1rem;
         }
 
@@ -79,40 +146,105 @@
             opacity: 1;
         }
 
+        .step.is-active .scene-kicker {
+            color: var(--crimson);
+        }
+
         figure {
             position: -webkit-sticky;
             position: sticky;
-            top: 0; 
-            width: 65%;
-            height: 100vh; 
+            top: 0;
+            width: 62%;
+            height: 100vh;
             margin: 0;
-            background-color: #ffffff;
+            background-color: var(--paper);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1;
         }
 
-        /* UPGRADED: Added a smooth "fade up" transform transition */
         #chart-container {
             width: 100%;
-            height: 100%;
+            height: 88%;
             transition: opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 1;
             transform: translateY(0);
         }
 
+        #chart-container .loading-msg {
+            text-align: center;
+            color: var(--muted);
+            font-family: var(--sans);
+            font-style: italic;
+        }
+
         .metric-highlight {
+            font-family: var(--sans);
             font-weight: 700;
-            color: #F94144; /* Updated to match new palette */
-            background-color: rgba(249, 65, 68, 0.1);
-            padding: 0 4px;
+            color: var(--crimson);
+            background-color: var(--crimson-wash);
+            padding: 0.05rem 0.3rem;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        code {
+            font-size: 0.9em;
+            background: var(--paper-deep);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+        }
+
+        /* ---------------------------------------------------------
+           Mobile: sticky chart pinned above scrolling text
+        --------------------------------------------------------- */
+        @media (max-width: 860px) {
+            #header {
+                padding: 8vh 6vw 4vh 6vw;
+                margin-bottom: 0;
+            }
+
+            #header p { font-size: 1.05rem; }
+
+            #scrolly {
+                flex-direction: column;
+                padding: 0;
+            }
+
+            article {
+                width: 100%;
+                padding: 0 6vw 10vh 6vw;
+                order: 2;
+            }
+
+            .step {
+                margin: 0 auto 52vh auto;
+                padding: 1.1rem 0;
+            }
+
+            .step:first-child { margin-top: 3vh; }
+
+            figure {
+                order: 1;
+                width: 100%;
+                height: 46vh;
+                top: 0;
+                box-shadow: 0 8px 16px -12px rgba(28, 27, 26, 0.35);
+                border-bottom: 1px solid var(--line);
+            }
+
+            .step h2 { font-size: 1.35rem; }
+            .step p { font-size: 1.02rem; }
         }
     </style>
 </head>
 <body>
 
+    <div id="progress-rail"></div>
+
     <div id="header">
+        <div class="kicker">A Causal Inference Investigation</div>
         <h1>Financial Toxicity: The Anatomy of a Medical Shock</h1>
         <p>An econometric audit of unexpected medical billing variance.</p>
     </div>
@@ -120,18 +252,21 @@
     <section id="scrolly">
         <article>
             <div class="step" data-scene="scene1">
+                <span class="scene-kicker">Scene 01</span>
                 <h2>The Billing Black Box</h2>
                 <p>Marcus recovers from a severe diabetic episode, relieved that the physical danger has passed. Then the hospital bill arrives.</p>
                 <p>Healthcare pricing is notoriously opaque. When we map out standard medical conditions like Diabetes, Asthma, and Heart Disease, the distribution of costs is astonishingly wide. A routine procedure that costs one patient a reasonable deductible can bankrupt another.</p>
             </div>
 
             <div class="step" data-scene="scene2">
+                <span class="scene-kicker">Scene 02</span>
                 <h2>Where Do Shocks Happen?</h2>
                 <p>Is this variance just a matter of being uninsured or not? Not entirely.</p>
                 <p>Looking at the variance matrix, we see that the nature of the admission disrupts standard pricing tiers. When patients enter through <strong>Emergency or Trauma</strong> pathways, they lose the ability to "shop around." Price transparency vanishes, and the variance in billing across all insurance networks explodes.</p>
             </div>
 
             <div class="step" data-scene="scene3">
+                <span class="scene-kicker">Scene 03</span>
                 <h2>The Baseline Cost (Doubly Robust AIPW Model)</h2>
                 <p>To separate correlation from causation, we deployed <strong>Augmented Inverse Probability Weighting (AIPW)</strong> — a doubly robust causal design that stays consistent if either the propensity-score model or the outcome model is correctly specified, without leaning on an instrument that has to satisfy an untestable exclusion restriction.</p>
                 <p>Comparing patients with an extended stay (11.6 more days, on average) to otherwise-similar patients without one, the model estimates a Doubly Robust Average Treatment Effect of <span class="metric-highlight" id="ate-impact">Loading...</span> — an implied marginal cost of roughly <span class="metric-highlight" id="causal-impact">Loading...</span> per additional day, squarely inside typical US acute-care inpatient benchmarks.</p>
@@ -139,11 +274,13 @@
             </div>
 
             <div class="step" data-scene="scene4">
+                <span class="scene-kicker">Scene 04</span>
                 <h2>The Unexplained Residuals</h2>
                 <p>By comparing each patient's actual bill to their AIPW counterfactual — what someone with the same age, condition, severity, insurance, and admission type would typically be charged — we isolate the <strong>Residuals</strong>.</p>
                 <p>The highlighted points on this chart represent the top 1% of statistical anomalies—patients like Marcus. Their bills run far above what their observable characteristics predict. Some of this gap is legitimate: unobserved clinical severity, complications, or procedures the model can't see. But a residual this large, this consistently, on top of a doubly robust baseline is also where opaque, hard-to-justify pricing hides — the closest thing this data can show to financial toxicity.</p>
             </div>
             <div class="step" data-scene="scene5">
+                <span class="scene-kicker">Scene 05</span>
                 <h2>A Note on Data & Governance</h2>
                 <p>The dataset driving this analysis (<code>Nicolybgs/healthcare_data</code> via Hugging Face) is entirely synthetic. Due to HIPAA regulations and strict internal governance, the highly granular patient-level billing and diagnostic data I work with daily cannot be publicly shared.</p>
                 <p>In the real world, the distribution of costs is influenced by complex, negotiated payer-provider contracts, and the resulting narrative might look different. I built this project using synthetic data specifically to highlight my technical ability to engineer scalable cloud data pipelines, apply rigorous econometric causal inference (Doubly Robust AIPW), and translate complex actuarial outputs into human-centric, data narratives.</p>
@@ -151,15 +288,15 @@
         </article>
 
         <figure>
-            <div id="chart-container" style="text-align: center; color: #999;">              
-                 <em>Loading interactive charts...</em>
+            <div id="chart-container">
+                <div class="loading-msg"><em>Loading interactive charts...</em></div>
             </div>
         </figure>
     </section>
 
     <script>
         const ASSET_BASE_PATH = 'scrollytelling_assets/';
-        const chartCache = {}; 
+        const chartCache = {};
         let currentScene = '';
 
         const fileMap = {
@@ -168,9 +305,6 @@
             'scene3': 'scene3_causal_coefficients.json',
             'scene4': 'scene4_residual_outliers.json'
         };
-
-        // User-Requested Color Palette
-        const palette = ['#F94144', '#F8961E', '#f9C74F', '#90BE6D', '#43AA8B', '#577590'];
 
         // 1. THE PRELOADER
         async function preloadAssets() {
@@ -193,23 +327,45 @@
                 }
             }
         }
-        
+
         preloadAssets();
 
-        // 2. RENDER CHART (With Race-Condition Fix)
+        // 2. RENDER CHART
+        // Every figure arrives from Healthcare_project.py already fully
+        // designed -- colors, fonts-free layout, margins, subplot titles,
+        // backgrounds matching the page's --paper token. The only thing this
+        // layer does at runtime is set the font family (so chart text matches
+        // the page's type system), tune the hover card, and let Plotly size
+        // itself to the sticky figure. It deliberately does NOT recolor or
+        // rebuild traces -- that used to live here and fight with whatever
+        // the Python side had already decided.
+        const CHART_FONT = { family: "'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif", color: '#3A3733' };
+
+        function applyRuntimeTheme(figure) {
+            figure.layout.autosize = true;
+            figure.layout.font = { ...CHART_FONT, ...(figure.layout.font || {}) };
+            figure.layout.hoverlabel = {
+                bgcolor: '#FFFFFF',
+                bordercolor: '#DFD8C9',
+                font: { family: CHART_FONT.family, size: 13, color: '#1C1B1A' },
+                align: 'left'
+            };
+            return figure;
+        }
+
         async function renderChart(sceneName) {
             if (sceneName === currentScene) return;
             currentScene = sceneName;
 
             const chartDiv = document.getElementById('chart-container');
 
-            // NEW LOGIC: If we hit Scene 5, fade the chart out to nothing and stop.
+            // Scene 5 has no chart -- fade the figure out entirely and stop.
             if (sceneName === 'scene5') {
                 chartDiv.style.opacity = 0;
                 chartDiv.style.transform = 'translateY(15px)';
                 return;
             }
-            
+
             const fileName = fileMap[sceneName];
             if (!fileName) return;
 
@@ -220,16 +376,14 @@
             // Wait for fade out
             setTimeout(async () => {
                 let figure;
-                
-                // FIX: If the preloader finished, use the cache. 
-                // If it hasn't finished yet, fetch it right now!
+
                 if (chartCache[sceneName]) {
                     figure = JSON.parse(JSON.stringify(chartCache[sceneName]));
                 } else {
                     try {
                         const response = await fetch(ASSET_BASE_PATH + fileName);
                         const rawData = await response.json();
-                        chartCache[sceneName] = rawData; 
+                        chartCache[sceneName] = rawData;
                         figure = JSON.parse(JSON.stringify(rawData));
                     } catch (error) {
                         chartDiv.innerHTML = "<em>Error loading chart data.</em>";
@@ -237,100 +391,35 @@
                         return;
                     }
                 }
-                
-                // Empty the "Loading..." text before drawing the chart
-                if (chartDiv.innerHTML.includes("Loading")) {
-                    chartDiv.innerHTML = ""; 
+
+                if (chartDiv.querySelector('.loading-msg')) {
+                    chartDiv.innerHTML = "";
                 }
 
-                const fontStyle = {family: "'Helvetica Neue', Helvetica, Arial, sans-serif", color: '#333'};
-                
-                figure.layout.autosize = true;
-                // Added sizeable left/right margins and a protected bottom margin for the x-axis
-                figure.layout.margin = {l: 120, r: 120, t: 60, b: 80}; 
-                figure.layout.paper_bgcolor = '#ffffff';
-                figure.layout.plot_bgcolor = '#ffffff';
-                figure.layout.font = fontStyle;
-                
-                // Inject the global colorway
-                figure.layout.colorway = palette;
+                applyRuntimeTheme(figure);
 
-                // --- 2. TOOLTIP (HOVERLABEL) AESTHETICS ---
-                figure.layout.hoverlabel = {
-                    bgcolor: '#ffffff',
-                    bordercolor: '#cccccc',
-                    font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif", size: 14, color: '#2c3e50' },
-                    align: 'left'
-                };
+                Plotly.react(chartDiv, figure.data, figure.layout, { displayModeBar: false, responsive: true });
 
-                // --- 3. AXIS CLEANUP ---
-                if (figure.layout.xaxis) {
-                    figure.layout.xaxis.showgrid = false;
-                    figure.layout.xaxis.zeroline = true;
-                    figure.layout.xaxis.zerolinecolor = '#eeeeee';
-                    figure.layout.xaxis.title.font = { size: 14, ...fontStyle };
-                    figure.layout.xaxis.tickfont = { size: 12, ...fontStyle };
-                }
-                if (figure.layout.yaxis) {
-                    figure.layout.yaxis.showgrid = true;
-                    figure.layout.yaxis.gridcolor = '#f0f0f0';
-                    figure.layout.yaxis.zeroline = true;
-                    figure.layout.yaxis.zerolinecolor = '#dddddd';
-                    figure.layout.yaxis.title.font = { size: 14, ...fontStyle };
-                    figure.layout.yaxis.tickfont = { size: 12, ...fontStyle };
-                }
-
-                // --- 4. DYNAMIC COLOR OVERRIDES BY SCENE ---
-                const groupColors = {};
-                let colorIdx = 0;
-
-                figure.data.forEach((trace) => {
-                    if (sceneName === 'scene1' || sceneName === 'scene2') {
-                        // Intercept Plotly's trace generation and explicitly lock marginals and histograms to the same palette color
-                        const groupName = trace.legendgroup || trace.name;
-                        if (groupName) {
-                            if (!groupColors[groupName]) {
-                                groupColors[groupName] = palette[colorIdx % palette.length];
-                                colorIdx++;
-                            }
-                            if (trace.marker) trace.marker.color = groupColors[groupName];
-                            if (trace.line) trace.line.color = groupColors[groupName];
-                        }
-                    } 
-                    else if (sceneName === 'scene3') {
-                        if (trace.marker) trace.marker.color = '#43AA8B'; 
-                    }
-                    else if (sceneName === 'scene4') {
-                        // Isolate the Outliers vs Baseline points
-                        if (String(trace.name).toLowerCase() === 'true') {
-                            trace.marker.color = '#F94144'; // Red
-                            trace.marker.size = 8;
-                            trace.marker.opacity = 1;
-                            trace.marker.line = {color: '#ffffff', width: 1}; // Clean white border 
-                        } else {
-                            trace.marker.color = '#577590'; // Slate Blue
-                            trace.marker.size = 4; // Smaller radius to de-emphasize naturally
-                            trace.marker.opacity = 0.75; // Crisper, non-faded base
-                            trace.marker.line = {width: 0};
-                        }
-                    }
-                });
-                
-                Plotly.react(chartDiv, figure.data, figure.layout, {displayModeBar: false, responsive: true});
-                
                 // Fade In & Float Up
                 chartDiv.style.opacity = 1;
                 chartDiv.style.transform = 'translateY(0)';
-            }, 400); 
+            }, 400);
         }
 
         // 3. THE CENTER-SCREEN OBSERVER
         const steps = document.querySelectorAll('.step');
-        
+        const isMobile = () => window.matchMedia('(max-width: 860px)').matches;
+
         const observerOptions = {
             root: null,
-            rootMargin: '-50% 0px -49% 0px', 
-            threshold: 0 
+            get rootMargin() {
+                // On mobile the chart is a pinned top strip rather than a
+                // full-height sticky panel, so the "trigger band" needs to
+                // sit lower on screen (roughly where the sticky chart's
+                // bottom edge is) instead of dead center.
+                return isMobile() ? '-46vh 0px -40% 0px' : '-50% 0px -49% 0px';
+            },
+            threshold: 0
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -338,7 +427,7 @@
                 if (entry.isIntersecting) {
                     steps.forEach(s => s.classList.remove('is-active'));
                     entry.target.classList.add('is-active');
-                    
+
                     const scene = entry.target.getAttribute('data-scene');
                     renderChart(scene);
                 }
@@ -346,6 +435,17 @@
         }, observerOptions);
 
         steps.forEach(step => observer.observe(step));
+
+        // 4. SCROLL PROGRESS RAIL
+        const progressRail = document.getElementById('progress-rail');
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            progressRail.style.width = pct + '%';
+        }
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        updateProgress();
     </script>
 </body>
 </html>
