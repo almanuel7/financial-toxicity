@@ -7,4 +7,5 @@ numpy>=1.24.0
 plotly>=5.18.0
 datasets>=2.19.0
 statsmodels>=0.14.0
-linearmodels>=5.0
+scikit-learn>=1.0
+scipy>=1.11.0

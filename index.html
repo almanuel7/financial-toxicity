@@ -132,21 +132,21 @@
             </div>
 
             <div class="step" data-scene="scene3">
-                <h2>The Baseline Cost (2SLS Model)</h2>
-                <p>To separate correlation from causation, we deployed an <strong>Instrumental Variable (2SLS) model</strong>. The diagnostics are rock-solid (a Wu-Hausman p-value of 0.0000 and a massive F-statistic of 746.54).</p>
-                <p>The model reveals a surprising truth: the physical length of care is relatively affordable. Every extra day in the hospital causally increases the baseline bill by exactly <span class="metric-highlight" id="causal-impact">Loading...</span>.</p>
-                <p>But if care only accumulates at this modest daily rate, what causes the catastrophic medical bills?</p>
+                <h2>The Baseline Cost (Doubly Robust AIPW Model)</h2>
+                <p>To separate correlation from causation, we deployed <strong>Augmented Inverse Probability Weighting (AIPW)</strong> — a doubly robust causal design that stays consistent if either the propensity-score model or the outcome model is correctly specified, without leaning on an instrument that has to satisfy an untestable exclusion restriction.</p>
+                <p>Comparing patients with an extended stay (11.6 more days, on average) to otherwise-similar patients without one, the model estimates a Doubly Robust Average Treatment Effect of <span class="metric-highlight" id="ate-impact">Loading...</span> — an implied marginal cost of roughly <span class="metric-highlight" id="causal-impact">Loading...</span> per additional day, squarely inside typical US acute-care inpatient benchmarks.</p>
+                <p>So if the physical days in a bed price out at a defensible, in-range daily rate, what causes the catastrophic medical bills?</p>
             </div>
 
             <div class="step" data-scene="scene4">
                 <h2>The Unexplained Residuals</h2>
-                <p>By calculating the predicted baseline bill and subtracting it from what patients were actually charged, we isolate the <strong>Residuals</strong>.</p>
-                <p>The highlighted points on this chart represent the top 1% of statistical anomalies—patients like Marcus. These are "Unexplained Shocks." They cannot be justified by the patient's age, their specific condition, or how many days they stayed in a bed. They represent pure, systemic financial toxicity baked into the pricing architecture itself.</p>
+                <p>By comparing each patient's actual bill to their AIPW counterfactual — what someone with the same age, condition, severity, insurance, and admission type would typically be charged — we isolate the <strong>Residuals</strong>.</p>
+                <p>The highlighted points on this chart represent the top 1% of statistical anomalies—patients like Marcus. Their bills run far above what their observable characteristics predict. Some of this gap is legitimate: unobserved clinical severity, complications, or procedures the model can't see. But a residual this large, this consistently, on top of a doubly robust baseline is also where opaque, hard-to-justify pricing hides — the closest thing this data can show to financial toxicity.</p>
             </div>
             <div class="step" data-scene="scene5">
                 <h2>A Note on Data & Governance</h2>
                 <p>The dataset driving this analysis (<code>Nicolybgs/healthcare_data</code> via Hugging Face) is entirely synthetic. Due to HIPAA regulations and strict internal governance, the highly granular patient-level billing and diagnostic data I work with daily cannot be publicly shared.</p>
-                <p>In the real world, the distribution of costs is influenced by complex, negotiated payer-provider contracts, and the resulting narrative might look different. I built this project using synthetic data specifically to highlight my technical ability to engineer scalable cloud data pipelines, apply rigorous econometric causal inference (2SLS), and translate complex actuarial outputs into human-centric, data narratives.</p>
+                <p>In the real world, the distribution of costs is influenced by complex, negotiated payer-provider contracts, and the resulting narrative might look different. I built this project using synthetic data specifically to highlight my technical ability to engineer scalable cloud data pipelines, apply rigorous econometric causal inference (Doubly Robust AIPW), and translate complex actuarial outputs into human-centric, data narratives.</p>
             </div>
         </article>
 
@@ -177,7 +177,9 @@
             try {
                 const metricRes = await fetch(ASSET_BASE_PATH + 'model_metrics.json');
                 const metricData = await metricRes.json();
-                document.getElementById('causal-impact').innerText = '$' + metricData.causal_impact_per_day.toLocaleString();
+                const usd = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('ate-impact').innerText = '$' + usd(metricData.causal_impact_extended_stay);
+                document.getElementById('causal-impact').innerText = '$' + usd(metricData.implied_marginal_cost_per_day);
             } catch (err) {
                 console.error("Could not load metrics: ", err);
             }

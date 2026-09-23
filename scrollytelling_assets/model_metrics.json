@@ -1,1 +1,1 @@
-{"causal_impact_per_day": 134.32, "p_value": 0.0, "weak_instrument_fstat": 746.54}
+{"causal_impact_extended_stay": 29781.4, "implied_marginal_cost_per_day": 2556.44, "p_value": 0.0, "ate_standard_error": 109.46, "identification_strategy": "Augmented Inverse Probability Weighting (AIPW) with Gamma GLM", "positivity_min": 0.168, "positivity_max": 0.99}
