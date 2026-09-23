@@ -31,7 +31,7 @@ The current version replaces that instrument with AIPW, a doubly robust design: 
 ## Repository layout
 
 - `index.html` -- the scrollytelling page. Everything (styles, scroll logic, chart rendering) is in this one file, aside from the Plotly.js library loaded from a CDN.
-- `scrollytelling_assets/` -- pre-rendered Plotly figure JSON for each scene, fetched by `index.html` at runtime. **Do not put these behind Git LFS** -- GitHub Pages serves LFS-tracked files as plain-text pointer stubs, not the real content, which would silently break every chart on the live site. Committing them as regular files (as this repo does) is the correct approach here despite their size.
+- `scrollytelling_assets/` -- pre-rendered Plotly figure JSON for each scene, fetched by `index.html` at runtime (~270KB total -- see "Chart design" below). **Do not put these behind Git LFS** -- GitHub Pages serves LFS-tracked files as plain-text pointer stubs, not the real content, which would silently break every chart on the live site. Committing them as regular files (as this repo does) is the correct approach here.
 - `Healthcare_project.py` -- the script that generates everything in `scrollytelling_assets/` from the raw Hugging Face dataset.
 
 ## Running locally
@@ -61,7 +61,7 @@ Every chart is built from pre-aggregated summary statistics rather than raw per-
 - **Scene 3 (The Baseline Cost)** -- a two-panel figure: a naive-vs-AIPW effect-size comparison bar, and a propensity-score overlap histogram (the positivity check) below it.
 - **Scene 4 (The Unexplained Residuals)** -- a 2D density heatmap (binned counts, zero-count cells masked transparent) of model-expected vs. actual billing for the bulk of patients, with the top 1% of residual outliers overlaid as individual points.
 
-Because every scene is built from bin counts or summary statistics instead of raw per-row data, the four scene files together total well under 1MB (down from an earlier per-row-data version of these charts that ran to roughly 66MB) -- fast enough to load comfortably on mobile, with no change to the underlying model or narrative.
+Because every scene is built from bin counts or summary statistics instead of raw per-row data, the four scene files together total roughly 270KB (`scene1_billing_distribution.json` ~100KB, `scene2_insurance_variance.json` ~8KB, `scene3_causal_coefficients.json` ~10KB, `scene4_residual_outliers.json` ~150KB) -- down from an earlier per-row-data version of these charts that ran to roughly 66MB, and fast enough to load comfortably on mobile, with no change to the underlying model or narrative.
 
 ## Tech stack
 
