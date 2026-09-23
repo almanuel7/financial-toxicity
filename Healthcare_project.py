@@ -525,6 +525,21 @@ def build_residual_scene4(df, output_dir):
             xref='paper', yref='paper', x=0.98, y=0.04, showarrow=False,
             font=dict(size=12, color=MUTED), xanchor='right',
         ))
+    # The outcome model's covariates (Age_Group, Medical_Condition,
+    # Severity_of_Illness, Insurance, Admission_Type) are all categorical, so
+    # "Model-expected bill" only takes a finite set of values -- one per
+    # covariate combination actually present in the data. Blank stretches of
+    # this axis are real gaps between those risk-profile tiers, not missing
+    # data or a binning artifact -- worth calling out so a reader doesn't
+    # mistake white space here for an error. Anchored well above and to the
+    # right of the density cloud/outlier cluster (which top out well below
+    # the shared axis max) rather than near the diagonal or the "+N more
+    # shocks" note, so it reads clearly without competing with either.
+    annotations.append(dict(
+        text="Gaps here are real, not missing data —<br>the model predicts from a finite set<br>of risk profiles, not a continuum.",
+        xref='paper', yref='paper', x=0.85, y=0.45, showarrow=False,
+        font=dict(size=11, color=MUTED), xanchor='center', align='center',
+    ))
     fig.update_layout(
         xaxis=dict(title='Model-expected bill (given actual stay length)', tickprefix='$', separatethousands=True,
                     showgrid=False, range=lims),
